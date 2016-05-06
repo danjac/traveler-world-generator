@@ -4,20 +4,20 @@ import argparse
 from .world import generate_worlds
 from .map import draw_map
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument('-v', '--verbose',
+                    help='Print long world descriptions',
+                    action='store_true')
+
+parser.add_argument('-n', '--names',
+                    help='List of world names')
+
+parser.add_argument('-o', '--output',
+                    help='Output starmap to file')
+
 
 def main():
-
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('-v', '--verbose',
-                        help='Print long world descriptions',
-                        action='store_true')
-
-    parser.add_argument('-n', '--names',
-                        help='List of world names')
-
-    parser.add_argument('-o', '--output',
-                        help='Output starmap to file')
 
     args = parser.parse_args()
 
