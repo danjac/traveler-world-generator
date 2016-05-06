@@ -3,10 +3,15 @@ import math
 
 from PIL import Image, ImageDraw
 
+WORLD_RADIUS = 5
+
 
 def draw_map(worlds, edge_length, filename=None):
-    image_size = edge_length * 20
-    image = Image.new('RGB', (image_size, image_size), 'white')
+
+    hex_width = round(math.sqrt(3) * edge_length)
+
+    image_size = (hex_width * 9, hex_width * 11)
+    image = Image.new('RGB', image_size, 'white')
 
     draw = ImageDraw.Draw(image)
     hex_generator = HexGenerator(edge_length)
@@ -15,8 +20,6 @@ def draw_map(worlds, edge_length, filename=None):
         for col in range(1, 5):
             hex = list(hex_generator(row, col))
             draw.polygon(hex, outline='black', fill='white')
-
-    hex_width = round(math.sqrt(3) * edge_length)
 
     for row in range(1, 11):
         # this needs to be fixed a bit to the right
@@ -33,8 +36,10 @@ def draw_map(worlds, edge_length, filename=None):
             world = worlds.get((col, row))
             if world is not None:
                 draw.text((x+10, y-10), world.starport, 12)
-                r = 5
-                draw.ellipse((x+12-r, y+10-r, x+12+r, y+10+r), fill='black')
+                draw.ellipse((x+12-WORLD_RADIUS,
+                              y+10-WORLD_RADIUS,
+                              x+12+WORLD_RADIUS,
+                              y+10+WORLD_RADIUS), fill='black')
             x += (edge_length * 1.5)
     if filename:
         image.save(filename)
