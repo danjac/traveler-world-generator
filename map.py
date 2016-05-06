@@ -4,7 +4,7 @@ import math
 from PIL import Image, ImageDraw
 
 
-def draw_map(worlds, edge_length):
+def draw_map(worlds, edge_length, filename=None):
     image_size = edge_length * 20
     image = Image.new('RGB', (image_size, image_size), 'white')
 
@@ -36,8 +36,10 @@ def draw_map(worlds, edge_length):
                 r = 5
                 draw.ellipse((x+12-r, y+10-r, x+12+r, y+10+r), fill='black')
             x += (edge_length * 1.5)
-    # image.save('hexmap.png')
-    image.show()
+    if filename:
+        image.save(filename)
+    else:
+        image.show()
 
 
 class HexGenerator(object):
@@ -55,6 +57,3 @@ class HexGenerator(object):
             x += math.cos(r_angle) * self.edge_length
             y += math.sin(r_angle) * self.edge_length
             yield x, y
-
-
-

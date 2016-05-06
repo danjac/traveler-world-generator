@@ -2,6 +2,7 @@ import math
 import random
 
 HEADERS = (
+    ("Name", "name", False),
     ("Coordinates", "coords_desc", False),
     ("Starport", "starport", False),
     ("Size", "size_desc", False),
@@ -174,12 +175,31 @@ def yesno(value):
     return "Yes" if value else "No"
 
 
-def generate_worlds():
+def generate_worlds(names_file):
+
+    names = []
+
+    if names_file:
+        with open(names_file) as fp:
+            names = set([n for n in [
+                n.strip() for n in fp.readlines()] if n])
+        if len(names) < 80:
+            raise RuntimeError(
+                "You must have at least 80 names in the list")
+        names = list(names)
+        random.shuffle(names)
+
     worlds = {}
     for i in range(1, 11):
         for j in range(1, 9):
             if die_roll(2) > 7:
-                world = World((j, i))
+
+                if names:
+                    name = names.pop()
+                else:
+                    name = ''
+
+                world = World(name, (j, i))
                 worlds[(j, i)] = world
 
     return worlds
@@ -187,8 +207,9 @@ def generate_worlds():
 
 class World(object):
 
-    def __init__(self, coordinates):
+    def __init__(self, name, coordinates):
 
+        self.name = name
         self.coordinates = coordinates
 
         self.is_gas_giant = die_roll(2) >= 10
@@ -322,7 +343,8 @@ class World(object):
                 header += "?"
             else:
                 header += ":"
-            print(header, spacing, value)
+            if value:
+                print(header, spacing, value)
 
     @property
     def uwp(self):
