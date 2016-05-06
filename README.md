@@ -15,3 +15,5 @@ Run `python -m traveler-world-generator --help` to see options.
 A sample name file is provided - thanks to Chris Wood for the sources:
 
 http://generators.christopherpound.com/
+
+This script requires Python 3.5+ and Pillow.
