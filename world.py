@@ -1,33 +1,6 @@
 import math
 import random
 
-HEADERS = (
-    ("Name", "name", False),
-    ("Coordinates", "coords_desc", False),
-    ("Starport", "starport", False),
-    ("Size", "size_desc", False),
-    ("Atmosphere", "atmosphere_desc", False),
-    ("Temperature", "temperature_desc", False),
-    ("Hydrographics", "hydrographics_desc", False),
-    ("Population", "population_desc", False),
-    ("Government", "government_desc", False),
-    ("Law level", "law_level_desc", False),
-    ("Tech level", "tech_level", False),
-    ("Trade classifications", "trade_classifications", False),
-    ("Gas giant", "is_gas_giant", True),
-    ("Scout base", "is_scout_base", True),
-    ("Naval base", "is_naval_base", True),
-    ("Research base", "is_research_base", True),
-    ("Pirate base", "is_pirate_base", True),
-    ("Traveler's Aid Society", "is_tas", True),
-    ("Imperial consulate", "is_consulate", True),
-    ("UWP", "uwp", False),
-)
-
-# longest header?
-
-MAX_HEADER_SIZE = max(len(row[0]) for row in HEADERS)
-
 
 TEMP_MODIFIERS = (
     ((2, 3), 2),
@@ -169,10 +142,6 @@ def die_roll(dice, modifier=0, min=None, max=None):
     if max is not None and result > max:
         result = max
     return result
-
-
-def yesno(value):
-    return "Yes" if value else "No"
 
 
 def generate_worlds(names_file):
@@ -334,18 +303,6 @@ class World(object):
 
         self.tech_level = die_roll(1, tech_modifier, 0, 16)
 
-    def pprint(self):
-        for header, attr, is_bool in HEADERS:
-            spacing = " " * (MAX_HEADER_SIZE - len(header))
-            value = getattr(self, attr)
-            if is_bool:
-                value = yesno(value)
-                header += "?"
-            else:
-                header += ":"
-            if value:
-                print(header, spacing, value)
-
     @property
     def uwp(self):
         rv = [self.starport]
@@ -360,6 +317,13 @@ class World(object):
 
         rv.append("-%.X" % self.tech_level)
 
+        return "".join(rv)
+
+    @property
+    def base_codes(self):
+        """
+        Returns short base codes as string
+        """
         bases = []
 
         if self.is_naval_base:
@@ -375,9 +339,10 @@ class World(object):
         if self.is_pirate_base:
             bases.append("P")
 
-        if bases:
-            rv.append(" ")
-            rv.append(" ".join(bases))
+        return " ".join(bases)
+
+    @property
+    def short_trade_classifications(self):
 
         trade_cls = []
 
@@ -385,11 +350,18 @@ class World(object):
             if getattr(self, attr):
                 trade_cls.append(code)
 
-        if trade_cls:
-            rv.append(" ")
-            rv.append(" ".join(trade_cls))
+        return " ".join(trade_cls)
 
-        return "".join(rv)
+    @property
+    def long_trade_classifications(self):
+
+        trade_cls = []
+
+        for attr, code in LONG_TRADE_CLASSIFICATIONS:
+            if getattr(self, attr):
+                trade_cls.append(code)
+
+        return " ".join(trade_cls)
 
     @property
     def is_agricultural(self):
@@ -526,15 +498,3 @@ class World(object):
     @property
     def law_level_desc(self):
         return LAW_LEVELS[self.law_level]
-
-    @property
-    def trade_classifications(self):
-        rv = []
-
-        for attr, code in LONG_TRADE_CLASSIFICATIONS:
-            if getattr(self, attr):
-                rv.append(code)
-
-        if not rv:
-            return "None"
-        return ", ".join(rv)
