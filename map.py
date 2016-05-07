@@ -1,7 +1,7 @@
 import math
 
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageChops
 
 WORLD_RADIUS = 5
 
@@ -41,6 +41,17 @@ def draw_map(worlds, edge_length, filename=None):
                               x+12+WORLD_RADIUS,
                               y+10+WORLD_RADIUS), fill='black')
             x += (edge_length * 1.5)
+
+    # trim excess whitespace
+
+    bg = Image.new(image.mode, image.size, image.getpixel((0, 0)))
+    diff = ImageChops.difference(image, bg)
+    diff2 = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff2.getbbox()
+
+    if bbox:
+        image = image.crop(bbox)
+
     if filename:
         image.save(filename)
     else:
